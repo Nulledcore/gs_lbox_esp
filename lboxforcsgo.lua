@@ -3,9 +3,11 @@ local tf2font = surface.create_font("TF2 Build", 12, 400, 0x200)
 
 
 ui.new_label("lua", "b", "----------------LMAOBOX.ESP----------------")
-local boxtypes = {"Off","Normal", "Outlined"}
+local boxtypes = {"Off","Solid", "Outlined"}
+local positions = {"Right", "Bottom"}
 local enable_lbox_esp = ui.new_checkbox("lua", "b", "Enable")
 local lbox_esp_type = ui.new_combobox("lua", "b", "Box type", boxtypes)
+local lbox_position = ui.new_combobox("lua", "b", "Position", positions)
 local lbox_chams = ui.new_checkbox("lua", "b", "Team chams")
 local lbox_glow = ui.new_checkbox("lua", "b", "Team glow")
 
@@ -24,6 +26,7 @@ local function get_distance_in_feet(a_x, a_y, a_z, b_x, b_y, b_z)
     return math.ceil(math.sqrt(math.pow(a_x - b_x, 2) + math.pow(a_y - b_y, 2) + math.pow(a_z - b_z, 2)) * 0.0254 / 0.3048)
 end
 
+local pos = {}
 local teams = {
 	[0] = "None",
 	[1] = "Spec",
@@ -133,22 +136,32 @@ client.set_event_callback("paint", function()
             renderer.rectangle(x1+3, y1+3, bb_width-2, 1, 17, 17, 17, 255)
             renderer.rectangle(x1+3, y1+3, 1, bb_height-2, 17, 17, 17, 255)
         end
-        surface.draw_text(x2+6, y1, r, g, b, a, tf2font, entity.get_player_name(enemy))
+
+        
+        local ui_positions = ui.get(lbox_position)
+        if ui_positions == positions[1] then
+            pos = {x2+6,y1}
+        elseif ui_positions == positions[2] then
+            pos = {x1,y2+5}
+        end
+
+
+        surface.draw_text(pos[1], pos[2], r, g, b, a, tf2font, entity.get_player_name(enemy))
 
         local epx, epy, epz = entity.get_prop(enemy, "m_vecOrigin")
         local lpx, lpy, lpz = entity.get_prop(entity.get_local_player(), "m_vecOrigin")
         local distance = get_distance_in_feet(lpx, lpy, lpz, epx, epy, epz)
-        surface.draw_text(x2+6, y1+12, r, g, b, a, tf2font, string.format("[%sf]", math.floor(distance)))
+        surface.draw_text(pos[1], pos[2]+12, r, g, b, a, tf2font, string.format("[%sf]", math.floor(distance)))
 
         local team = teams[entity.get_prop(enemy, "m_iTeamNum")]
-        surface.draw_text(x2+6, y1+24, r, g, b, a, tf2font, team)
+        surface.draw_text(pos[1], pos[2]+24, r, g, b, a, tf2font, team)
 
-        surface.draw_text(x2+6, y1+36, hr, hg, hb, a, tf2font, string.format("%s/100 HP", health))
+        surface.draw_text(pos[1], pos[2]+36, hr, hg, hb, a, tf2font, string.format("%s/100 HP", health))
         renderer.rectangle(x1-6, y1, 4, bb_height+4.5, 17, 17, 17, a)
         renderer.rectangle(x1-5, y2+2, 2, (-bb_height*health/100), hr, hg, hb, a)
 
         local weapon = entity.get_player_weapon(enemy)
         local cname = entity.get_classname(weapon)
-        surface.draw_text(x2+6, y1+48, r, g, b, a, tf2font, cname)
+        surface.draw_text(pos[1], pos[2]+48, r, g, b, a, tf2font, cname)
     end
 end)
