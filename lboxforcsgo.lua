@@ -22,6 +22,78 @@ ui.new_label("lua", "b", "CT XQZ Color")
 local ctclr_xqz = ui.new_color_picker("lua", "b", "ctclr_xqz", 113,175,255, 255, 255)
 ui.new_label("lua", "b", "------------------------------------------------")
 
+local weapons = {
+    [1] = "Desert Eagle",
+    [2] = "Dual Berettas",
+    [3] = "Five-SeveN",
+    [4] = "Glock-18",
+    [7] = "AK-47",
+    [8] = "AUG",
+    [9] = "AWP",
+    [10] = "FAMAS",
+    [11] = "G3SG1",
+    [13] = "Galil AR",
+    [14] = "M249",
+    [16] = "M4A4",
+    [17] = "MAC-10",
+    [19] = "P90",
+    [23] = "MP5-SD",
+    [24] = "UMP-45",
+    [25] = "XM1014",
+    [26] = "PP-Bizon",
+    [27] = "MAG-7",
+    [28] = "Negev",
+    [29] = "Sawed-Off",
+    [30] = "Tec-9",
+    [31] = "Taser",
+    [32] = "P2000",
+    [33] = "MP7",
+    [34] = "MP9",
+    [35] = "Nova",
+    [36] = "P250",
+    [38] = "SCAR-20",
+    [39] = "SG 553",
+    [40] = "SSG 08",
+    [41] = "Knife",
+    [42] = "Knife",
+    [43] = "Flashbang",
+    [44] = "HE Grenade",
+    [45] = "Smoke",
+    [46] = "Molotov",
+    [47] = "Decoy",
+    [48] = "Incendiary",
+    [49] = "C4",
+    [59] = "Knife",
+    [60] = "M4A1-S",
+    [61] = "USP-S",
+    [63] = "CZ75-Auto",
+    [64] = "R8 Revolver",
+    [500] = "Bayonet",
+    [505] = "Flip Knife",
+    [506] = "Gut Knife",
+    [507] = "Karambit",
+    [508] = "M9 Bayonet",
+    [509] = "Huntsman Knife",
+    [512] = "Falchion Knife",
+    [514] = "Bowie Knife",
+    [515] = "Butterfly Knife",
+    [516] = "Shadow Daggers",
+    [519] = "Ursus Knife",
+    [520] = "Navaja Knife",
+    [522] = "Siletto Knife",
+    [523] = "Talon Knife",
+}
+
+local function get_weapon(enemy) -- s/o to nmchris
+    local weapon_id = entity.get_prop(enemy, "m_hActiveWeapon")
+    if entity.get_prop(weapon_id, "m_iItemDefinitionIndex") ~= nil then
+       local weapon_item_index = bit.band(entity.get_prop(weapon_id, "m_iItemDefinitionIndex"), 0xFFFF)
+        return weapons[weapon_item_index]
+    end
+    return 0
+end
+
+
 local function get_distance_in_feet(a_x, a_y, a_z, b_x, b_y, b_z)
     return math.ceil(math.sqrt(math.pow(a_x - b_x, 2) + math.pow(a_y - b_y, 2) + math.pow(a_z - b_z, 2)) * 0.0254 / 0.3048)
 end
@@ -160,8 +232,6 @@ client.set_event_callback("paint", function()
         renderer.rectangle(x1-6, y1, 4, bb_height+4.5, 17, 17, 17, a)
         renderer.rectangle(x1-5, y2+2, 2, (-bb_height*health/100), hr, hg, hb, a)
 
-        local weapon = entity.get_player_weapon(enemy)
-        local cname = entity.get_classname(weapon)
-        surface.draw_text(pos[1], pos[2]+48, r, g, b, a, tf2font, cname)
+        surface.draw_text(pos[1], pos[2]+48, r, g, b, a, tf2font, get_weapon(enemy))
     end
 end)
